@@ -6,8 +6,9 @@ A Helm chart to delete pods stuck in a pending state without image pull secrets
 
 It is recommended to verify the service account is provisioned with secrets before creating deployments, but this chart is intended for cases where that is not feasible.
 
-This chart is intended to be run after any needed application charts have been deployed to
-an OpenShift cluster. The chart will create RBAC resources and deploy a job using the `openshift4/ose-cli` image. The job runs a Bash script that uses kubectl to identify pods stuck pending without image pull secrets, and deletes them. The script searches for pods multiple times to ensure deployment controllers have ample time to create pods.
+This chart is intended to be run during the installation of other application charts on the cluster. The chart will create RBAC resources and a single-pod deployment using the `openshift4/ose-cli` image. The pod runs a Bash script that uses kubectl to identify pods stuck pending without image pull secrets, and deletes them. This script repeats at an interval configurable by the `waitIntervalSeconds` value.
+
+This chart can be uninstalled once the application charts have been successfully installed.
 
 # Deployment
 This chart can be installed directly from a release archive or by cloning this repo locally.

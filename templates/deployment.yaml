@@ -1,36 +1,36 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: {{ include "pod-pullsecret-reconciler.fullname" . }}
   labels:
     {{- include "pod-pullsecret-reconciler.labels" . | nindent 4 }}
-  annotations:
-    "helm.sh/hook": post-install
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
-  backoffLimit: 5
-  activeDeadlineSeconds: 1800
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "pod-pullsecret-reconciler.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-    {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      labels:
+        {{- include "pod-pullsecret-reconciler.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "pod-pullsecret-reconciler.serviceAccountName" . }}
-      restartPolicy: Never
+      restartPolicy: Always
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: WAIT_INTERVAL
+              value: "{{ .Values.waitIntervalSeconds }}"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           command:
-          - /bin/bash
-          - /script/reconcile.sh
+            - /bin/bash
+            - /script/reconcile.sh
           volumeMounts:
-          - name: script
-            mountPath: /script
+            - name: script
+              mountPath: /script
       volumes:
         - name: script
           configMap:
