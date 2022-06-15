@@ -5,7 +5,7 @@
 
 while true; do
     echo "Finding Pending pods with no image pull secrets..."
-    pods=$(oc get po --all-namespaces --field-selector=status.phase==Pending -o go-template='{{range .items}}{{.metadata.namespace}} {{.metadata.name}} {{ len .metadata.ownerReferences }} {{ len .spec.imagePullSecrets }}{{"\n"}}{{end}}')
+    pods=$(oc get po --all-namespaces --field-selector=status.phase==Pending -o go-template='{{range .items}}{{.metadata.namespace}} {{.metadata.name}} {{with .metadata.ownerReferences}}{{len .}}{{else}}0{{end}} {{with .spec.imagePullSecrets}}{{len .}}{{else}}0{{end}}{{"\n"}}{{end}}')
 
     count=0
     # loop over all pending pods
