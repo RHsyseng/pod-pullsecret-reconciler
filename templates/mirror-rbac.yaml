@@ -1,0 +1,32 @@
+{{- if .Values.mirrorRBAC.enabled -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "pod-pullsecret-reconciler.fullname" . }}-mirror
+  labels:
+    {{- include "pod-pullsecret-reconciler.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "pod-pullsecret-reconciler.fullname" . }}-mirror
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:unauthenticated
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "pod-pullsecret-reconciler.fullname" . }}-mirror
+  labels:
+    {{- include "pod-pullsecret-reconciler.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - image.openshift.io
+  resources:
+  - imagestreams/layers
+  resourceNames: 
+  {{- .Values.mirrorRBAC.imageStreams | toYaml | nindent 2 }}
+  verbs:
+  - get
+{{- end -}}

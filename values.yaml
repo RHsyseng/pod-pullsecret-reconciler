@@ -7,6 +7,16 @@ image:
   pullPolicy: IfNotPresent
   tag: v4.8
 
+# In cases where the image must be mirrored instead of pulled directly from the registry,
+# this app faces the same race condition it was built to mitigate. Since this image is mirrored
+# directly from registry.redhat.io and contains no internal data, the "mirrorRBAC" option
+# can be used to allow anonymous image pulls for the mirrored image. This allows pods to pull
+# the image, even without a service account's image pull secret.
+mirrorRBAC:
+  enabled: true
+  imageStreams:
+  - ose-cli
+
 # number of seconds to wait between executions
 waitIntervalSeconds: 30
 
