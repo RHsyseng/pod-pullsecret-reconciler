@@ -5,6 +5,7 @@
 image:
   repository: registry.redhat.io/openshift4/ose-cli
   pullPolicy: IfNotPresent
+  # The image tag should match the minor release of OpenShift being used
   tag: v4.8
 
 # In cases where the image must be mirrored instead of pulled directly from the registry,
@@ -14,10 +15,11 @@ image:
 # the image, even without a service account's image pull secret.
 mirrorRBAC:
   enabled: true
+  # Any image streams in the list below are allowed to be pulled anonymously
   imageStreams:
   - ose-cli
 
-# number of seconds to wait between executions
+# number of seconds to wait between iterations of discovering stuck pods
 waitIntervalSeconds: 30
 
 nameOverride: ""
